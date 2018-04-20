@@ -139,7 +139,10 @@ export default function(context, options = {}) {
     .then(() => {
       let application = getApplication();
       if (application) {
-        return application.boot();
+        application.buildRegistry();
+        application.reset();
+        return Promise.resolve(application);
+        // return application.boot();
       }
     })
     .then(() => {
@@ -167,6 +170,9 @@ export default function(context, options = {}) {
       return buildOwner(getApplication(), getResolver());
     })
     .then(owner => {
+      owner.lookup = owner.__container__.lookup.bind(owner.__container__);
+      owner._lookupFactory = owner.__container__.lookupFactory.bind(owner.__container__);
+
       Object.defineProperty(context, 'owner', {
         value: owner,
         writable: false,

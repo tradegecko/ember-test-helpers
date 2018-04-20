@@ -23,7 +23,8 @@ import legacyBuildRegistry from 'ember-test-helpers/legacy-0-6-x/build-registry'
 */
 export default function buildOwner(application, resolver) {
   if (application) {
-    return application.boot().then(app => app.buildInstance().boot());
+    return Promise.resolve(application);
+    // return application.boot().then(app => app.buildInstance().boot());
   }
 
   if (!resolver) {
