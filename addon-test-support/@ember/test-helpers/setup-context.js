@@ -2,7 +2,7 @@ import { run } from '@ember/runloop';
 import { set, setProperties, get, getProperties } from '@ember/object';
 import { guidFor } from '@ember/object/internals';
 import buildOwner from './build-owner';
-import { _setupAJAXHooks } from './settled';
+import settled, { _setupAJAXHooks } from './settled';
 import Ember from 'ember';
 import { Promise } from 'rsvp';
 import { assert } from '@ember/debug';
@@ -172,6 +172,11 @@ export default function(context, options = {}) {
     .then(owner => {
       owner.lookup = owner.__container__.lookup.bind(owner.__container__);
       owner._lookupFactory = owner.__container__.lookupFactory.bind(owner.__container__);
+      owner.visit = function(url) {
+        let router = owner.lookup('router:main');
+        router.transitionTo(url);
+        return settled();
+      };
 
       Object.defineProperty(context, 'owner', {
         value: owner,
