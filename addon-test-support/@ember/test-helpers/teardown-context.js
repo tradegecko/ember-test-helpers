@@ -29,6 +29,9 @@ export default function teardownContext(context) {
       // run(owner, 'destroy');
       Ember.testing = false;
 
+      //remove the ember listeners on the rootElement manually as we're not destroying the app coz of legacy issues
+      $(owner.rootElement).off('.ember', '**').removeClass('ember-application');
+
       unsetContext();
 
       return settled();
