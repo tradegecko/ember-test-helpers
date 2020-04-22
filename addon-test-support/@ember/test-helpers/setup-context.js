@@ -138,11 +138,20 @@ export default function(context, options = {}) {
   return nextTickPromise()
     .then(() => {
       let application = getApplication();
-      if (application) {
-        application.buildRegistry();
-        application.reset();
-        return Promise.resolve(application);
-        // return application.boot();
+      application.buildRegistry();
+      application.reset();
+      if (window.EMBER_CLI) {
+        return new Promise((resolve) => {
+          let timer = setInterval(() => {
+            if (application._readinessDeferrals === 0) {
+              clearInterval(timer);
+              application.__deprecatedInstance__.setupEventDispatcher();
+              application.runInstanceInitializers(application.__deprecatedInstance__);
+              application.__deprecatedInstance__.setupRouter()
+              resolve();
+            }
+          }, 10);
+        });
       }
     })
     .then(() => {
@@ -167,9 +176,10 @@ export default function(context, options = {}) {
         return buildOwner(null, resolver);
       }
 
-      return buildOwner(getApplication(), getResolver());
+      // return buildOwner(getApplication(), getResolver());
     })
-    .then(owner => {
+    .then(() => {
+      let owner = getApplication();
       owner.lookup = owner.__container__.lookup.bind(owner.__container__);
       owner._lookupFactory = owner.__container__.lookupFactory.bind(owner.__container__);
       owner.visit = function(url) {
@@ -188,7 +198,6 @@ export default function(context, options = {}) {
           let ret = run(function() {
             return set(context, key, value);
           });
-
           return ret;
         },
         writable: false,
