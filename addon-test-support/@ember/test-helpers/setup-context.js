@@ -147,6 +147,7 @@ export default function(context, options = {}) {
               clearInterval(timer);
               application.__deprecatedInstance__.setupEventDispatcher();
               application.runInstanceInitializers(application.__deprecatedInstance__);
+              application.ready()
               application.__deprecatedInstance__.setupRouter()
               resolve();
             }
